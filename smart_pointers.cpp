@@ -18,6 +18,7 @@ public:
     this->type = c;
     std::cout << this->type << " con" << std::endl;
   }
+  void hello() { std::cout << "hello\n"; }
   ~Custom() { std::cout << this->type << " des" << std::endl; }
 };
 
@@ -29,12 +30,22 @@ int main() {
    * NOTE: smart pointer solution to respectively: (complex: unique -> shared)
    * unique: - / automatic (RAII) /  out of scope: delete / no copies allowed
    * std::move -> deletes old resource / steal mover's resource
+   *
+   * NOTE: ref_count evolution: important to move ahead with weak pointer
    * shared: - / automatic (RAII) / alive (an owner is)   / free iff ref_cnt = 0
-   * P -> C, C -> P / ref-cnt init at 1 / ref-cnt++ for each / cyclic dependency
-   * weak: non-owning (ref-cnt += 0)
+   * tip: draw a diagram for each control block to understand better.
+   * ref-cnt: is for the control block. Each pointer to a CB, has same ref
+   * count. When sp.ref_count() is first resolves to the CB, then value is
+   * reported. sp.reset() / sp = nullptr. Points back to null. Goes to zero
+   * after these. int * raw = sp.get(); ref_count unchanged. user must delete.
+   * pass by value: ref_count++, pass by reference: as is
+   * https://chatgpt.com/g/g-p-69673c1795888191a19a1ea6885798b9-systems-programming/shared/c/69c60a05-5774-8323-8cf6-b1f3705f469f?owner_user_id=user-CJUqFrsqykR5uAe3R4C6mge3
    *
    * NOTE: nullptr dereference STILL PERSISTS
-   * weak: must lock() and null-check first
+   * weak: non-owning (ref-cnt += 0)
+   * resolve cyclic dependency issue. n1: o1, n2:o2, n1->next:o2, n2->next:o1
+   * weak: wp.lock() and null-check first / creates temp shared_ptr
+   * wp = sp; if sp.reset(), wp.lock() return nullptr
    */
 
   // NOTE: unique pointer: ownership / lifetime -> deterministic
@@ -67,6 +78,7 @@ int main() {
   // NOTE: shared pointer: ownership / lifetime -> non-deterministic
   std::shared_ptr<Custom> shrd_cs_1 = std::make_shared<Custom>('s');
   // NOTE: use_count is only to be use in non-multithreded environments
+  // atomic (reports snapshot value), but may not be valid immediately after
   std::cout << "ref cnt for shrd_cs : (1) " << shrd_cs_1.use_count() << "\n";
 
   {
@@ -82,4 +94,22 @@ int main() {
 
   // on destroy: shrd_cs_2 destroyed -> 1, shrd_cs_1 destroyed -> 0
   std::cout << "block depth: 0" << std::endl;
+
+  // NOTE: weak pointers
+  std::weak_ptr<Custom> weak_cs;
+  weak_cs = shrd_cs_1; // does NOT raise ref count
+
+  // NOT thread safe
+  if (not weak_cs.expired()) {
+    // weak_cs cannot dereference since not an owner
+    std::shared_ptr<Custom> temp = weak_cs.lock(); // temp ref_count++
+    temp->hello();
+  }
+  // temp goes out of scope
+
+  if (auto temp = weak_cs.lock()) {
+    temp->hello();
+  }
+
+  return 0;
 }
