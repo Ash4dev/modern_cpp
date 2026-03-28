@@ -35,8 +35,8 @@ int main() {
    * shared: - / automatic (RAII) / alive (an owner is)   / free iff ref_cnt = 0
    * tip: draw a diagram for each control block to understand better.
    * ref-cnt: is for the control block. Each pointer to a CB, has same ref
-   * count. When sp.ref_count() is first resolves to the CB, then value is
-   * reported. sp.reset() / sp = nullptr. Points back to null. Goes to zero
+   * count. When sp.ref_count() is first resolves to the CB, then reported.
+   * sp.reset() / sp = nullptr. Points back to null. Goes to zero
    * after these. int * raw = sp.get(); ref_count unchanged. user must delete.
    * pass by value: ref_count++, pass by reference: as is
    * https://chatgpt.com/g/g-p-69673c1795888191a19a1ea6885798b9-systems-programming/shared/c/69c60a05-5774-8323-8cf6-b1f3705f469f?owner_user_id=user-CJUqFrsqykR5uAe3R4C6mge3

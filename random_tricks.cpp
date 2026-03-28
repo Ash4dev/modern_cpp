@@ -20,6 +20,12 @@
 #include <functional>  // std::function
 #include <type_traits> // is_const, decltype
 
+// NOTE: interface & Implementation files
+// Interface (.h / .hpp) & Implementation (.c / .cpp / .cxx: valid!)
+// convention: .h compatible with C ABI, .hpp exclusively C++ ABI
+// keep all headers grouped inside /include, -I./include (from root)
+// #include <relative_path_wrt_I>
+
 // NOTE: function pointers
 typedef int (*bad_fn_ptr_t)(int, int); // must stay true to signature always
 using good_fn_ptr =
