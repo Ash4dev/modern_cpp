@@ -27,6 +27,10 @@
 // Rule of 3: implicit constructors generate shallow copies by default
 // Rule of BIG 2: If RAII is followed by data members, destructor is optional
 
+// NOTE: classes and structs are functionally equivalent (default access mode)
+// Byte padding is performed to word-align for ease of preprocessor access
+// Convention: Use struct in a C-fashion and classes for everything else
+
 class Array {
 private:
   int *data;
