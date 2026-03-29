@@ -9,6 +9,12 @@
 #include <iostream>
 #include <istream>
 
+// NOTE: RAII: acquire all necessary resources at init & free them at destr
+// wrap limited resource around a wrapper. constructor & destructor handle it
+// for eg.: std::lock_guard<std::mutex> : unlocks mutex even if early return
+
+class FriendClassExample {};
+
 class Vector3f {
   float x, y, z;
 
@@ -19,6 +25,14 @@ public:
 
   /* NOTE: operators are member functions part of the defined class
    * all non-static members receive this as the first argument implicitly
+
+   * NOTE:
+   * member functions are stored in the text segment like other functions
+   * all objects share a single copy of the each member function (pointers)
+   * on object creation, allocation happens for non-static data members
+   * function resolution: instruction pointers sees a call to a fixed address
+   * member functions: resolve as regular function, this hidden argument to fn
+   * fixed address can NOT be known by compiler, virtual table indirection
    */
   Vector3f operator+(const Vector3f &other) const; // const protects "this"
   Vector3f operator-() const;                      // unary -
@@ -38,13 +52,18 @@ public:
    * friendship of function is not mutual / transitive / inherited
    * not a member function, yet has access to pri/pro data of Vector3f
    * do NOT have access to "this": declared inside, defineed outside
+   * friend functions are useful for unit tests
    */
   friend std::ostream &operator<<(std::ostream &ostream,
                                   const Vector3f &vector);
+  friend class FriendClassExample;
 };
 
 // NOTE: can NOT use "this" as soon as constructor begins execution
-Vector3f::Vector3f() : x{0}, y{0}, z{0} {}
+// simple constructor with only init: default constructor followed by assignment
+// member initializer lists ease: non-static const/ref members (init must fix)
+// member initialization happens in the order of definintion inside the class
+Vector3f::Vector3f() : x{0}, y{0}, z{0} {} // member initializer list
 Vector3f::Vector3f(float x, float y, float z) : x{x}, y{y}, z{z} {};
 
 bool Vector3f::operator==(const Vector3f &other) const {
