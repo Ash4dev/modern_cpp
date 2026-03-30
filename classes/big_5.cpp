@@ -20,12 +20,32 @@ private:
 public:
   // NOTE: every constructor must leave object in valid destructable state
   IntArray();                                 // default constructor
-  IntArray(std::string name);                 // custom constructor
   IntArray(const IntArray &other);            // copy-constructor
   IntArray(IntArray &&source);                // move-constructor
   IntArray &operator=(const IntArray &other); // copy-assignment operator
   IntArray &operator=(IntArray &&source);     // move-assignment operator
   ~IntArray();                                // destructor
+
+  // NOTE: restricts copy init or copy list init to class type not arg match
+  // for the time being assume IntArray also has a constructor from int
+  // copy-init: IntArray a = 10; copy-list-init: IntArray a = {10};
+  // prevents implicit conversions (as copy-init / copy-list-init) used
+  // allows direct-init (IntArray a(10)) / direct-list-init (IntArray a{10})
+  // return type does not match, cannot use explicit constructor(pass-by-v)
+
+  // NOTE: practical mental rule: if init with =, explicit constructors ignored
+  // make any constructor that will accept a single argument explicit by default
+  // Do not make copy/move cons. explicit, as these do not perform conversions.
+
+  // void fn (IntArray): fn(IntArray("name")) WORKS but fn("name") does NOT
+  // "name" -> IntArray -> fn is NOT allowed anymore with explicit keyword
+  explicit IntArray(std::string name); // custom constructor
+
+  // static_cast<bool> (arr) WORKS bool b = arr; FAILS
+  // void fn(bool): fn(arr) will NOT work
+  explicit operator bool() const;
+  // if (arr) / while(arr) / for (; ();) / logical operators: boolean contexts
+  // boolean contexual bool conversions (special)
 };
 
 // default lead to unitialized data when freed lead to segmentation fault
@@ -100,6 +120,9 @@ IntArray &IntArray::operator=(IntArray &&source) {
 
   return *this;
 }
+
+// explicit keyword is ONLY used in the declaration
+IntArray::operator bool() const { return (this->data != nullptr); }
 
 IntArray foo() {
   IntArray arr{"yo"};
