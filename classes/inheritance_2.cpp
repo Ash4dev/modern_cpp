@@ -47,6 +47,8 @@
  * Animal *ptr {new Cat}; delete ptr; destructor for static type (Animal) called
  * if the destructor were virtual, clean up is ensured for the derived classes
  * no need for override keyword, since all destructors have same signature
+ * cleaner-design: avoid delete/close/unlock in derived classes if possible
+ * if cannot, then make sure that the destructors are virtual
  *
  * NOTE: should we make all destructors virtual? what is the benefit-cost?
  * cost: class turned into polymorphic (just for destructor alone)
