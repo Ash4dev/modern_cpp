@@ -63,6 +63,7 @@ public:
 // simple constructor with only init: default constructor followed by assignment
 // member initializer lists ease: non-static const/ref members (init must fix)
 // member initialization happens in the order of definintion inside the class
+// member initializer lists prevent copy (assignment). Useful for references
 Vector3f::Vector3f() : x{0}, y{0}, z{0} {} // member initializer list
 Vector3f::Vector3f(float x, float y, float z) : x{x}, y{y}, z{z} {};
 

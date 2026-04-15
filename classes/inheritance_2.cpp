@@ -77,6 +77,7 @@ public:
   // NOTE: avoid usage of virtual keyword but override for compile-time check
   // override keyword incurs no performance penalty: good practice to use
   // final keyword prevents further inheritance / overriding at compile-time
+  // override and final are keywords in particular contexts only
   std::string_view getName() const override final { return "Derived"; }
 };
 
