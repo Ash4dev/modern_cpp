@@ -49,6 +49,7 @@ int main() {
    */
 
   // NOTE: unique pointer: ownership / lifetime -> deterministic
+  // custom deleter can be provided when working with legacy API: file
   std::cout << "block depth: 0" << std::endl;
 
   std::unique_ptr<Custom> unq_cs = std::unique_ptr<Custom>(new Custom('u'));
