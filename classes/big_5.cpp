@@ -37,6 +37,10 @@ public:
   // make any constructor that will accept a single argument explicit by default
   // Do not make copy/move cons. explicit, as these do not perform conversions.
 
+  //  The rule is if you declare any copy/move/destructor function, then declare
+  //  all of them. True rule of 5.
+  //  RAII ties the lifetime of the resource to the class. Compositon.
+
   // void fn (IntArray): fn(IntArray("name")) WORKS but fn("name") does NOT
   // "name" -> IntArray -> fn is NOT allowed anymore with explicit keyword
   explicit IntArray(std::string name); // custom constructor
